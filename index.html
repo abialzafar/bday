@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Lady Boss System 💛 | Animated Final Message</title>
+    <title>Lady Boss System 💛 | Password Protected Finale</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
     <style>
         * {
@@ -199,7 +199,7 @@
             z-index: 19;
         }
 
-        /* FINAL CARD - animated typing area, no password */
+        /* FINAL CARD - password protected with typing animation */
         #finalCard {
             display: none;
             background: rgba(0, 0, 0, 0.78);
@@ -207,6 +207,61 @@
             border-radius: 56px;
             border-left: 4px solid #ffb347;
             border-right: 4px solid #ffb6c1;
+        }
+        
+        .password-section {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .password-section input {
+            background: rgba(30,20,40,0.9);
+            border: 2px solid #ffb6c1;
+            padding: 14px 24px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            color: white;
+            width: 80%;
+            text-align: center;
+            outline: none;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
+        .password-section input:focus {
+            box-shadow: 0 0 20px #ffb6c1;
+            border-color: #ffd966;
+        }
+        
+        .unlock-btn {
+            background: linear-gradient(115deg, #ffb347, #ff6b6b);
+            padding: 10px 32px;
+            font-size: 1.1rem;
+        }
+        
+        .locked-message {
+            color: #ffb6c1;
+            font-style: italic;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.5);
+            display: inline-block;
+            padding: 8px 28px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+        }
+        
+        .final-content-wrapper {
+            display: none;
+            animation: fadeInContent 0.8s ease;
+        }
+        
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .final-typing-area {
@@ -222,23 +277,6 @@
             border-left: 3px solid #ffb6c1;
             white-space: pre-wrap;
             word-break: break-word;
-        }
-        
-        .final-typing-area span {
-            display: inline;
-        }
-        
-        .cursor-blink {
-            display: inline-block;
-            width: 2px;
-            background: #ffb6c1;
-            animation: blinkStep 0.9s infinite;
-            margin-left: 2px;
-        }
-        
-        @keyframes blinkStep {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
         }
         
         .urdu {
@@ -273,6 +311,11 @@
             0% { transform: translateY(100vh) rotate(0deg); opacity: 0.7;}
             100% { transform: translateY(-10vh) rotate(360deg); opacity: 0;}
         }
+        
+        @keyframes sparkleFade { 
+            0% { opacity: 1; transform: scale(1); } 
+            100% { opacity: 0; transform: scale(1.8); } 
+        }
     </style>
 </head>
 <body>
@@ -295,13 +338,26 @@
 <div class="heart" id="heartIcon" onclick="revealSecretMsg()">💛</div>
 <div class="secret" id="secretMsg">💎 You are more special than you think — keep shining 💎</div>
 
-<!-- FINAL CARD (NO PASSWORD, animated typing for final message) -->
+<!-- FINAL CARD (PASSWORD PROTECTED with animated typing) -->
 <div class="screen" id="finalCard">
     <div style="text-align: center;">
         <div class="final-title">💛 Happy Birthday, Lady Boss 💛</div>
-        <div id="finalTypingContainer" class="final-typing-area"></div>
-        <div id="finalUrduContainer" class="urdu" style="display: none;"></div>
-        <div id="finalSignature" style="margin-top: 20px; font-style: italic; opacity: 0.9;"></div>
+        
+        <!-- Password Protection Section -->
+        <div id="passwordProtectionArea">
+            <div class="locked-message" id="lockStatus">🔒 The final blessing is locked 🔒</div>
+            <div class="password-section">
+                <input type="password" id="passInput" placeholder="Enter secret code ✨" autocomplete="off">
+                <button class="unlock-btn" onclick="attemptUnlock()">Unlock Heartfelt Message</button>
+            </div>
+        </div>
+        
+        <!-- Hidden content that appears after correct password -->
+        <div id="finalContentWrapper" class="final-content-wrapper">
+            <div id="finalTypingContainer" class="final-typing-area"></div>
+            <div id="finalUrduContainer" class="urdu" style="display: none;"></div>
+            <div id="finalSignature" style="margin-top: 20px; font-style: italic; opacity: 0.9;"></div>
+        </div>
     </div>
 </div>
 
@@ -488,23 +544,31 @@
             msgIndex++;
             typeMessage(messageSteps[msgIndex]);
         } else if (msgIndex + 1 === messageSteps.length) {
-            // close main screen and open final card with ANIMATED TYPING (password removed)
+            // close main screen and show final card with password protection
             document.getElementById("mainScreen").style.display = "none";
             const finalCardDiv = document.getElementById("finalCard");
             finalCardDiv.style.display = "block";
             finalCardDiv.style.animation = "fadeGlow 0.8s ease";
             
-            // HIDE HEART ICON while final message is being written
+            // HIDE HEART ICON while final message is locked/typing
             const heartIcon = document.getElementById("heartIcon");
             heartIcon.classList.add("hidden");
             
-            // Start animated typing for final long message (no password required)
-            startFinalMessageTyping();
+            // Reset password UI state
+            document.getElementById("passwordProtectionArea").style.display = "block";
+            document.getElementById("finalContentWrapper").style.display = "none";
+            document.getElementById("passInput").value = "";
+            document.getElementById("lockStatus").innerHTML = "🔒 The final blessing is locked 🔒";
+            document.getElementById("lockStatus").style.color = "#ffb6c1";
+            const unlockBtn = document.querySelector(".unlock-btn");
+            unlockBtn.disabled = false;
+            unlockBtn.innerText = "Unlock Heartfelt Message";
+            document.getElementById("passInput").disabled = false;
         }
     }
     
     // --------------------------------------------------------------
-    // 3. FINAL MESSAGE WITH TYPING ANIMATION (elegant, no password)
+    // 3. FINAL MESSAGE WITH TYPING ANIMATION (triggered after correct password)
     // --------------------------------------------------------------
     const finalFullMessage = `✨ Numbers 6:24-26 ✨
 “The LORD bless you and keep you;
@@ -521,7 +585,7 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
     const signatureLine = `💫 With endless admiration & respect 💫`;
     
     let finalTypingActive = false;
-    let finalTypingInterval = null;
+    let finalTypingTimeout = null;
     let finalCharIndex = 0;
     let finalContainer = null;
     let urduContainer = null;
@@ -535,8 +599,8 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
         if (!finalContainer) return;
         finalContainer.innerHTML = "";
         urduElem.style.display = "none";
+        urduElem.innerHTML = "";
         signatureElem.innerHTML = "";
-        
         finalCharIndex = 0;
         finalTypingActive = true;
         
@@ -545,12 +609,11 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
             if (finalCharIndex < finalFullMessage.length) {
                 finalContainer.innerHTML += finalFullMessage[finalCharIndex];
                 finalCharIndex++;
-                finalTypingInterval = setTimeout(typeNextChar, 28);
-                // Auto scroll to bottom
+                finalTypingTimeout = setTimeout(typeNextChar, 28);
                 finalContainer.scrollTop = finalContainer.scrollHeight;
             } else {
                 // message done, now show urdu with typing effect
-                clearTimeout(finalTypingInterval);
+                clearTimeout(finalTypingTimeout);
                 typeUrduWithAnimation();
             }
         }
@@ -581,7 +644,7 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
                             // All done, show the heart again after final message is fully written
                             const heartIcon = document.getElementById("heartIcon");
                             heartIcon.classList.remove("hidden");
-                            // Add a little extra sparkle
+                            // Add celebration sparkles
                             createCelebrationSparkles();
                         }
                     }
@@ -612,13 +675,44 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
         }
     }
     
-    // Add sparkle keyframe
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = `@keyframes sparkleFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }`;
-    document.head.appendChild(styleSheet);
+    // --------------------------------------------------------------
+    // 4. PASSWORD PROTECTION - Password is "pasandida" (case-insensitive)
+    // --------------------------------------------------------------
+    function attemptUnlock() {
+        const inputPass = document.getElementById("passInput").value.trim();
+        const correctPassword = "pasandida";
+        const lockStatusSpan = document.getElementById("lockStatus");
+        const passwordArea = document.getElementById("passwordProtectionArea");
+        const contentWrapper = document.getElementById("finalContentWrapper");
+        
+        if (inputPass.toLowerCase() === correctPassword.toLowerCase()) {
+            // Correct password - reveal and start typing animation
+            passwordArea.style.display = "none";
+            contentWrapper.style.display = "block";
+            
+            // Start animated typing for final message
+            startFinalMessageTyping();
+        } else {
+            lockStatusSpan.innerHTML = "❌ Incorrect code. Hint: the special word from the first message ❌";
+            lockStatusSpan.style.color = "#ff8888";
+            document.getElementById("passInput").value = "";
+            document.getElementById("passInput").focus();
+            setTimeout(() => {
+                if (lockStatusSpan.innerHTML.includes("Incorrect")) {
+                    lockStatusSpan.innerHTML = "🔒 The final blessing is locked 🔒";
+                    lockStatusSpan.style.color = "#ffb6c1";
+                }
+            }, 2500);
+        }
+    }
+    
+    // Allow Enter key in password input
+    document.getElementById("passInput")?.addEventListener("keypress", (e) => {
+        if(e.key === "Enter") attemptUnlock();
+    });
     
     // --------------------------------------------------------------
-    // 4. START SEQUENCE (flicker, zoom, music, particles)
+    // 5. START SEQUENCE (flicker, zoom, music, particles)
     // --------------------------------------------------------------
     function startSequence() {
         if (window.sequenceStarted) return;
@@ -681,9 +775,7 @@ Happiest Birthday Once Again — the universe shines brighter because of you! �
     
     window.sequenceStarted = false;
     
-    // Ensure heart doesn't reappear before final message fully typed
-    // Additional: remove password prompt completely
-    console.log("Lady Boss — Glowing Knob + Animated Final Message ✨");
+    console.log("Lady Boss — Glowing Knob + Password Protected Final Message (pasandida) ✨");
 </script>
 </body>
 </html>
