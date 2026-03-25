@@ -7,10 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box;}
+*{box-sizing:border-box;margin:0;padding:0;}
 
 body{
-    margin:0;
     height:100vh;
     display:flex;
     justify-content:center;
@@ -18,21 +17,17 @@ body{
     background:url("background.avif") no-repeat center/cover;
     font-family:monospace;
     overflow:hidden;
-    transition:all 2s ease;
+    transition:2s;
 }
 
-/* CAMERA */
-body.zoomed{
-    transform:scale(1.05);
-}
+body.zoomed{transform:scale(1.05);}
 
-/* OVERLAY */
+/* overlay */
 .overlay{
     position:fixed;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.9);
-    transition:opacity 2s ease;
+    width:100%;height:100%;
+    background:#000;
+    transition:2s;
 }
 
 /* SWITCH */
@@ -50,22 +45,18 @@ body.zoomed{
     width:3px;
     height:180px;
     background:linear-gradient(#aaa,#fff);
-    transform-origin:top;
 }
 
 .knob{
-    width:32px;
-    height:32px;
-    background:radial-gradient(circle,#00f0ff,#ffb6c1);
+    width:32px;height:32px;
     border-radius:50%;
+    background:radial-gradient(circle,#00f0ff,#ffb6c1);
     box-shadow:0 0 30px #00f0ff,0 0 20px #ffb6c1;
     cursor:grab;
-    position:relative;
-    transform-origin:top center; /* pivot for swing */
-    transition: transform 0.05s linear; /* smooth small movements */
+    transform-origin:top center;
 }
 
-/* PANEL */
+/* SCREEN */
 .screen{
     display:none;
     width:90%;
@@ -74,32 +65,26 @@ body.zoomed{
     border-radius:25px;
     background:rgba(0,0,0,0.55);
     backdrop-filter:blur(12px);
-    box-shadow:0 0 80px rgba(255,182,193,0.25);
     text-align:center;
     color:white;
 }
 
-/* TEXT */
 .typing{
     border-right:2px solid #00f0ff;
     white-space:pre-line;
-    font-size:clamp(18px,2vw,26px);
-    margin-bottom:30px;
+    margin-bottom:20px;
 }
 
-/* BUTTON */
+/* button */
 button{
-    background:linear-gradient(45deg,#ffb6c1,#00f0ff);
-    border:none;
-    color:#000;
     padding:12px 30px;
+    border:none;
     border-radius:30px;
-    font-weight:bold;
+    background:linear-gradient(45deg,#ffb6c1,#00f0ff);
     cursor:pointer;
-    box-shadow:0 0 20px rgba(255,182,193,0.6);
 }
 
-/* HEART */
+/* heart */
 .heart{
     position:absolute;
     bottom:40px;
@@ -107,42 +92,31 @@ button{
     transform:translateX(-50%);
     font-size:32px;
     animation:beat 1.2s infinite;
-    cursor:pointer;
 }
-@keyframes beat{
-    50%{transform:translateX(-50%) scale(1.3);}
-}
+@keyframes beat{50%{transform:translateX(-50%) scale(1.3);}}
 
-/* SECRET */
 .secret{
     position:absolute;
     bottom:90px;
     left:50%;
     transform:translateX(-50%);
-    color:#ffb6c1;
     opacity:0;
+    color:#ffb6c1;
     transition:1s;
 }
 
-/* URDU */
+/* urdu */
 .urdu{
     font-family:'Noto Nastaliq Urdu', serif;
     font-size:20px;
-    line-height:2;
 }
 
-/* PARTICLES */
-.particle{
-    position:absolute;
-    width:5px;
-    height:5px;
-    border-radius:50%;
-    opacity:0.5;
-    animation:float linear infinite;
-}
-@keyframes float{
-    from{transform:translateY(100vh);}
-    to{transform:translateY(-10vh);}
+/* canvas */
+canvas{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    pointer-events:none;
 }
 </style>
 </head>
@@ -151,43 +125,28 @@ button{
 
 <div class="overlay" id="overlay"></div>
 
-<!-- SWITCH -->
 <div class="switch-container" id="switch">
-    <div class="string" id="string"></div>
+    <div class="string"></div>
     <div class="knob" id="knob"></div>
 </div>
 
-<!-- MAIN -->
 <div class="screen" id="mainScreen">
     <h1 id="text" class="typing"></h1>
     <button onclick="nextStep()">Continue</button>
 </div>
 
-<!-- HEART -->
 <div class="heart" onclick="showSecret()">❤️</div>
 <div class="secret" id="secret">You are more special than you think 💛</div>
 
-<!-- FINAL -->
 <div class="screen" id="finalCard">
-    <h2>💛 Happy Birthday 💛</h2>
-
-    <p><strong>Numbers 6:24-26:</strong><br>
-    The LORD bless you and keep you;<br>
-    the LORD make his face shine upon you;<br>
-    the LORD give you peace.</p>
-
-    <p>
-    Wishing you a fantastic year ahead filled with groundbreaking discoveries and exciting breakthroughs in your work on MXenes, ion interactions, and energy systems. May your research continue to push boundaries, spark innovation, and contribute to a more sustainable and energy-efficient future.
-
-Here’s to new ideas, successful experiments, and achievements that make a real impact—just like you do!
-    </p>
-
-    <p class="urdu">
-    خدا آپکے ساتھ ہو… آپکی ہر دلی مراد پوری کرے 💛
-    </p>
-
-    <p>Happiest Birthday Once Again 💛</p>
+    <h2 id="finalTitle" class="typing"></h2>
+    <p id="verse" class="typing"></p>
+    <p id="message" class="typing"></p>
+    <p id="urduText" class="urdu typing"></p>
+    <p id="ending" class="typing"></p>
 </div>
+
+<canvas id="fireworks"></canvas>
 
 <audio id="music" loop>
 <source src="music.mp3">
@@ -195,143 +154,213 @@ Here’s to new ideas, successful experiments, and achievements that make a real
 
 <script>
 
+/* ---------------- TEXT ---------------- */
 const messages=[
 "Welcome Dear. Pasandida Aurat 💛",
-"I have been luckier to know you than MXene | Ion Interaction | Energy Systems from 6th July, 2025.\n\nI want to take a moment to say:"
+"I have been luckier to know you than MXene | Ion Interaction | Energy Systems...\n\nI want to say something:"
 ];
 
 let step=0;
 const textEl=document.getElementById("text");
 
-/* typing */
 function type(text,speed=40){
     textEl.innerHTML="";
     let i=0;
     let interval=setInterval(()=>{
         textEl.innerHTML+=text[i];
-        i++;
-        if(i>=text.length) clearInterval(interval);
+        if(++i>=text.length) clearInterval(interval);
     },speed);
 }
 
-/* PHYSICS SWITCH */
+function typeElement(el,text,speed=30,cb){
+    el.innerHTML="";
+    let i=0;
+    let interval=setInterval(()=>{
+        el.innerHTML+=text[i];
+        if(++i>=text.length){
+            clearInterval(interval);
+            if(cb) cb();
+        }
+    },speed);
+}
+
+/* ---------------- SWITCH PHYSICS ---------------- */
 const knob=document.getElementById("knob");
-const string=document.getElementById("string");
+const string=document.querySelector(".string");
 
-let dragging=false;
-let startY=0;
-let currentY=0;
-
-const MAX_PULL=120;
-const TRIGGER=70;
+let dragging=false,startY=0,currentY=0,angle=0,velocity=0;
 
 knob.addEventListener("mousedown",(e)=>{
     dragging=true;
     startY=e.clientY;
-    knob.style.cursor="grabbing";
-});
-
-document.addEventListener("mouseup",()=>{
-    if(dragging){
-        dragging=false;
-        knob.style.cursor="grab";
-
-        if(currentY<TRIGGER){
-            snapBack();
-        }else{
-            startSequence();
-        }
-    }
 });
 
 document.addEventListener("mousemove",(e)=>{
     if(!dragging) return;
 
-    let dy = (e.clientY - startY) * 0.6;
-    currentY = Math.max(0, Math.min(MAX_PULL, dy));
+    let dy=(e.clientY-startY)*0.6;
+    currentY=Math.max(0,Math.min(120,dy));
 
-    // Calculate swing based on horizontal movement
-    let dx = e.clientX - window.innerWidth/2; 
-    let swing = Math.max(-15, Math.min(15, dx/20)); // limit swing -15° to 15°
+    let dx=e.clientX-window.innerWidth/2;
+    angle=Math.max(-20,Math.min(20,dx/15));
 
-    knob.style.transform = `translateY(${currentY}px) rotate(${swing}deg)`;
-    string.style.height = 180 + currentY + "px";
+    updateSwitch();
 });
 
-/* SNAP BACK */
-function snapBack(){
-    let velocity = currentY;
-    let swing = 0;
+document.addEventListener("mouseup",()=>{
+    if(!dragging) return;
+    dragging=false;
 
-    let interval = setInterval(()=>{
-        velocity *= 0.75;
-        currentY -= velocity * 0.1;
+    if(currentY>70) startSequence();
+    else releaseSwing();
+});
 
-        // swing returns to center smoothly
-        swing *= 0.75;
+function updateSwitch(){
+    knob.style.transform=`translateY(${currentY}px) rotate(${angle}deg)`;
+    string.style.height=180+currentY+"px";
+}
 
-        if(currentY <= 1){
-            currentY = 0;
-            swing = 0;
+function releaseSwing(){
+    velocity=angle*0.2;
+
+    let interval=setInterval(()=>{
+        velocity*=0.92;
+        angle-=velocity;
+        currentY*=0.85;
+
+        if(Math.abs(angle)<0.5 && currentY<1){
+            angle=0;currentY=0;
             clearInterval(interval);
         }
-
-        knob.style.transform = `translateY(${currentY}px) rotate(${swing}deg)`;
-        string.style.height = 180 + currentY + "px";
-
+        updateSwitch();
     },16);
 }
 
-/* START */
+/* ---------------- START ---------------- */
 function startSequence(){
     document.getElementById("switch").style.display="none";
 
-    let flashes=0;
-    let flicker=setInterval(()=>{
-        document.body.style.filter = flashes%2?"brightness(0.6)":"brightness(1)";
-        flashes++;
-        if(flashes>6){
-            clearInterval(flicker);
-
-            document.getElementById("overlay").style.opacity="0";
+    let flicker=0;
+    let fx=setInterval(()=>{
+        document.body.style.filter=flicker%2?"brightness(0.6)":"brightness(1)";
+        if(++flicker>6){
+            clearInterval(fx);
+            overlay.style.opacity=0;
             document.body.classList.add("zoomed");
-
-            document.getElementById("mainScreen").style.display="block";
-            document.getElementById("music").play();
-
+            mainScreen.style.display="block";
+            music.play();
             type(messages[0]);
             createParticles();
         }
     },120);
 }
 
-/* NEXT */
+/* ---------------- NEXT ---------------- */
 function nextStep(){
     step++;
     if(step<messages.length){
         type(messages[step]);
     }else{
-        document.getElementById("mainScreen").style.display="none";
-        document.getElementById("finalCard").style.display="block";
+        mainScreen.style.display="none";
+        finalCard.style.display="block";
+        startFinalAnimation();
+        startFireworks();
     }
 }
 
-/* SECRET */
-function showSecret(){
-    document.getElementById("secret").style.opacity="1";
+/* ---------------- FINAL TEXT ---------------- */
+function startFinalAnimation(){
+    typeElement(finalTitle,"💛 Happy Birthday 💛",60,()=>{
+        typeElement(verse,"Numbers 6:24-26:\nThe LORD bless you and keep you;<br> the LORD make his face shine upon you;<br> the LORD give you peace.",30,()=>{
+            typeElement(message,"Wishing you a fantastic year ahead filled with groundbreaking discoveries and exciting breakthroughs in your work on MXenes, ion interactions, and energy systems. May your research continue to push boundaries, spark innovation, and contribute to a more sustainable and energy-efficient future",25,()=>{
+                typeElement(urduText,"خدا آپکے ساتھ ہو… آپکی ہر دلی مراد پوری کرے 💛",40,()=>{
+                    typeElement(ending,"Happiest Birthday Once Again 💛",50);
+                });
+            });
+        });
+    });
 }
 
-/* PARTICLES */
+/* ---------------- SECRET ---------------- */
+function showSecret(){
+    secret.style.opacity=1;
+}
+
+/* ---------------- PARTICLES ---------------- */
 function createParticles(){
     setInterval(()=>{
         let p=document.createElement("div");
-        p.className="particle";
+        p.style.position="absolute";
+        p.style.width="4px";
+        p.style.height="4px";
+        p.style.borderRadius="50%";
         p.style.left=Math.random()*100+"%";
         p.style.background=Math.random()>0.5?"#ffb6c1":"#00f0ff";
-        p.style.animationDuration=(10+Math.random()*5)+"s";
+        p.style.animation="float 10s linear";
         document.body.appendChild(p);
-        setTimeout(()=>p.remove(),15000);
+        setTimeout(()=>p.remove(),10000);
     },300);
+}
+
+/* ---------------- FIREWORKS (BEAT SYNC) ---------------- */
+function startFireworks(){
+
+    const canvas=document.getElementById("fireworks");
+    const ctx=canvas.getContext("2d");
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+
+    const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=audioCtx.createMediaElementSource(music);
+    const analyser=audioCtx.createAnalyser();
+
+    src.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    analyser.fftSize=64;
+    const data=new Uint8Array(analyser.frequencyBinCount);
+
+    let particles=[];
+
+    function fire(intensity){
+        let x=Math.random()*canvas.width;
+        let y=Math.random()*canvas.height/2;
+
+        for(let i=0;i<intensity/5;i++){
+            particles.push({
+                x,y,
+                angle:Math.random()*Math.PI*2,
+                speed:Math.random()*3+intensity/30,
+                life:80
+            });
+        }
+    }
+
+    function animate(){
+        requestAnimationFrame(animate);
+        analyser.getByteFrequencyData(data);
+
+        let bass=data[2];
+        if(bass>140) fire(bass);
+
+        ctx.fillStyle="rgba(0,0,0,0.2)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        particles.forEach((p,i)=>{
+            p.x+=Math.cos(p.angle)*p.speed;
+            p.y+=Math.sin(p.angle)*p.speed;
+            p.life--;
+
+            ctx.beginPath();
+            ctx.arc(p.x,p.y,2,0,Math.PI*2);
+            ctx.fillStyle="hsl("+Math.random()*360+",100%,70%)";
+            ctx.fill();
+
+            if(p.life<=0) particles.splice(i,1);
+        });
+    }
+
+    animate();
 }
 
 </script>
