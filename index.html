@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Lady Boss System 🔐 | Birthday Magic</title>
+    <title>Lady Boss System 💛 | Animated Final Message</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
     <style>
         * {
@@ -29,7 +29,6 @@
             transform: scale(1.05);
         }
 
-        /* Dark overlay fade */
         .overlay {
             position: fixed;
             top: 0;
@@ -42,7 +41,7 @@
             z-index: 2;
         }
 
-        /* ---- REALISTIC STRING & KNOB (PENDULUM + SWING) ---- */
+        /* ---- GLOWING KNOB (pulsing like heart) ---- */
         .switch-container {
             position: absolute;
             top: 0;
@@ -67,28 +66,43 @@
         }
 
         .knob {
-            width: 36px;
-            height: 36px;
-            background: radial-gradient(circle at 30% 30%, #ffd966, #ffb347);
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle at 30% 30%, #ffd966, #ff9f4a);
             border-radius: 50%;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,215,0,0.5), 0 0 15px #ffb6c1;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,215,0,0.6);
             cursor: grab;
             transform-origin: top center;
-            transition: transform 0.02s linear;
+            transition: transform 0.02s linear, box-shadow 0.3s ease;
             position: relative;
+            animation: knobPulse 1.2s infinite ease-in-out;
         }
+        
+        /* Glowing on/off like heart beat */
+        @keyframes knobPulse {
+            0% { 
+                box-shadow: 0 0 0 0 rgba(255, 182, 193, 0.7), 0 0 0 2px rgba(255,215,0,0.6), 0 8px 18px rgba(0,0,0,0.3);
+            }
+            50% { 
+                box-shadow: 0 0 0 12px rgba(255, 182, 193, 0.4), 0 0 0 4px #ffd966, 0 8px 20px rgba(255,100,100,0.6);
+            }
+            100% { 
+                box-shadow: 0 0 0 0 rgba(255, 182, 193, 0), 0 0 0 2px rgba(255,215,0,0.6), 0 8px 18px rgba(0,0,0,0.3);
+            }
+        }
+        
         .knob:active {
             cursor: grabbing;
         }
-        /* tiny reflection */
+        
         .knob::after {
             content: "";
             position: absolute;
             top: 6px;
-            left: 8px;
+            left: 9px;
             width: 8px;
             height: 8px;
-            background: rgba(255,255,200,0.8);
+            background: rgba(255,255,200,0.9);
             border-radius: 50%;
         }
 
@@ -99,7 +113,7 @@
             max-width: 780px;
             padding: 35px 30px;
             border-radius: 48px;
-            background: rgba(10, 5, 20, 0.65);
+            background: rgba(10, 5, 20, 0.7);
             backdrop-filter: blur(16px);
             box-shadow: 0 25px 45px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,182,193,0.3);
             text-align: center;
@@ -122,6 +136,7 @@
             font-family: monospace;
             text-shadow: 0 0 5px rgba(0,0,0,0.5);
             letter-spacing: 0.3px;
+            line-height: 1.4;
         }
 
         button {
@@ -142,7 +157,7 @@
             box-shadow: 0 0 18px #ffb6c1;
         }
 
-        /* Heart + secret */
+        /* HEART - hidden during final message writing */
         .heart {
             position: absolute;
             bottom: 40px;
@@ -153,11 +168,18 @@
             filter: drop-shadow(0 0 8px #ff6b8b);
             animation: beat 1.1s infinite ease;
             z-index: 18;
+            transition: opacity 0.4s;
         }
+        .heart.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
         @keyframes beat {
             0%,100%{ transform: translateX(-50%) scale(1);}
             50%{ transform: translateX(-50%) scale(1.28); text-shadow: 0 0 12px #ff99aa;}
         }
+        
         .secret {
             position: absolute;
             bottom: 100px;
@@ -177,77 +199,65 @@
             z-index: 19;
         }
 
-        /* FINAL CARD - password protected + entrance animation */
+        /* FINAL CARD - animated typing area, no password */
         #finalCard {
             display: none;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.78);
             backdrop-filter: blur(18px);
             border-radius: 56px;
             border-left: 4px solid #ffb347;
             border-right: 4px solid #ffb6c1;
         }
-        .protected-content {
-            transition: all 0.5s;
-        }
-        .password-section {
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        .password-section input {
-            background: rgba(30,20,40,0.8);
-            border: 1px solid #ffb6c1;
-            padding: 12px 20px;
-            border-radius: 60px;
-            font-size: 1rem;
-            color: white;
-            width: 70%;
-            text-align: center;
-            outline: none;
+        
+        .final-typing-area {
+            text-align: left;
             font-family: monospace;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #fff0dd;
+            background: rgba(0,0,0,0.3);
+            border-radius: 32px;
+            padding: 25px;
+            margin: 15px 0;
+            border-left: 3px solid #ffb6c1;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
-        .password-section input:focus {
-            box-shadow: 0 0 12px #ffb6c1;
+        
+        .final-typing-area span {
+            display: inline;
         }
-        .unlock-btn {
-            background: #ff9f4a;
-            padding: 8px 25px;
-            font-size: 1rem;
-        }
-        .locked-message {
-            color: #ffb6c1;
-            font-style: italic;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.4);
+        
+        .cursor-blink {
             display: inline-block;
-            padding: 8px 24px;
-            border-radius: 40px;
+            width: 2px;
+            background: #ffb6c1;
+            animation: blinkStep 0.9s infinite;
+            margin-left: 2px;
         }
-        .final-blessing {
-            display: none;
-            animation: elegantRise 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        
+        @keyframes blinkStep {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
-        @keyframes elegantRise {
-            0% { opacity: 0; transform: translateY(45px) scale(0.96); filter: blur(6px);}
-            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0);}
-        }
-        .final-blessing h2 {
-            font-size: 2.4rem;
-            background: linear-gradient(135deg, #FFD966, #FFA07A);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 20px;
-        }
+        
         .urdu {
             font-family: 'Noto Nastaliq Urdu', serif;
             font-size: 1.5rem;
             line-height: 1.7;
             color: #ffecb3;
+            margin-top: 15px;
         }
-
+        
+        .final-title {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #FFD966, #FFA07A);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+        
         /* particles */
         .particle {
             position: absolute;
@@ -269,7 +279,7 @@
 
 <div class="overlay" id="overlay" style="opacity:1"></div>
 
-<!-- REAL SWING STRING -->
+<!-- GLOWING KNOB (pulsing heart-beat style) -->
 <div class="switch-container" id="switchHandle">
     <div class="string" id="stringEl"></div>
     <div class="knob" id="knobEl"></div>
@@ -281,30 +291,17 @@
     <button onclick="advanceMessage()">✨ Continue ✨</button>
 </div>
 
-<!-- HEART & SECRET -->
-<div class="heart" onclick="revealSecretMsg()">💛</div>
-<div class="secret" id="secretMsg">💎 You are a brilliant soul — your spark changes the world 💎</div>
+<!-- HEART & SECRET (will hide during final typing) -->
+<div class="heart" id="heartIcon" onclick="revealSecretMsg()">💛</div>
+<div class="secret" id="secretMsg">💎 You are more special than you think — keep shining 💎</div>
 
-<!-- FINAL CARD (PASSWORD PROTECTED) -->
+<!-- FINAL CARD (NO PASSWORD, animated typing for final message) -->
 <div class="screen" id="finalCard">
-    <div class="protected-content" id="protectedZone">
-        <div class="locked-message" id="lockStatus">🔒 The final blessing is locked 🔒</div>
-        <div class="password-section">
-            <input type="password" id="passInput" placeholder="Enter secret code ✨" autocomplete="off">
-            <button class="unlock-btn" onclick="attemptUnlock()">Unlock Heartfelt Message</button>
-        </div>
-        <div id="finalBlessingContainer" class="final-blessing">
-            <h2>💛 Happy Birthday, Lady Boss 💛</h2>
-            <p><strong>✨ Numbers 6:24-26 ✨</strong><br>
-            “The LORD bless you and keep you;<br>
-            the LORD make his face shine upon you<br>
-            and be gracious to you;<br>
-            the LORD turn his face toward you<br>
-            and give you peace.”</p>
-            <p>🌟 Wishing you a year bursting with discoveries in MXenes, ion interactions, and energy systems. May your research break new ground, fuel innovation, and shape a sustainable future. Your brilliance inspires everyone around you!</p>
-            <p class="urdu">خدا آپ کے ساتھ ہو… ہر خواب شرمندہ تعبیر ہو 💛</p>
-            <p>💫 Happiest Birthday Once Again — the universe shines brighter because of you! 💫</p>
-        </div>
+    <div style="text-align: center;">
+        <div class="final-title">💛 Happy Birthday, Lady Boss 💛</div>
+        <div id="finalTypingContainer" class="final-typing-area"></div>
+        <div id="finalUrduContainer" class="urdu" style="display: none;"></div>
+        <div id="finalSignature" style="margin-top: 20px; font-style: italic; opacity: 0.9;"></div>
     </div>
 </div>
 
@@ -314,68 +311,55 @@
 
 <script>
     // --------------------------------------------------------------
-    // 1. REALISTIC PENDULUM + SWING physics (string behaves like real object)
+    // 1. REALISTIC STRING + SWING PHYSICS (glowing knob already pulsing via CSS)
     // --------------------------------------------------------------
     const knob = document.getElementById("knobEl");
     const stringDiv = document.getElementById("stringEl");
     let dragging = false;
-    let startY = 0, currentPull = 0;
-    let startX = 0, currentAngle = 0;      // for horizontal swing
-    let velocityPull = 0, velocityAngle = 0;
-    let animationFrame = null;
-    let isAnimatingSnap = false;
+    let startY = 0, pullOffset = 0;
+    let startX = 0, angle = 0;
     let triggerStarted = false;
 
-    const MAX_PULL = 130;      // max downward stretch
-    const TRIGGER_THRESHOLD = 70;  // pull distance to activate
+    const MAX_PULL = 130;
+    const TRIGGER_THRESHOLD = 70;
     
-    // physics constants for realistic oscillation
-    let angle = 0;          // current swing angle in degrees
-    let angularVel = 0;
-    let pullOffset = 0;     // current vertical displacement
-
+    let swingAnimId = null;
+    
     function updateVisuals() {
-        // apply string height: original 180px + pullOffset
         let newHeight = 180 + Math.min(MAX_PULL, pullOffset);
         stringDiv.style.height = newHeight + "px";
-        // apply swing angle and vertical translation
         knob.style.transform = `translateY(${pullOffset}px) rotate(${angle}deg)`;
     }
-
-    // Damped harmonic swing (pendulum style) when released
-    let swingAnimId = null;
+    
     function startSwingOscillation(initialAngle, initialAngularVel) {
         if (swingAnimId) cancelAnimationFrame(swingAnimId);
         let ang = initialAngle;
         let angVel = initialAngularVel;
-        const DAMP = 0.97;
-        const GRAVITY_SWING = 0.45;
+        const DAMP = 0.96;
+        const GRAVITY_SWING = 0.48;
         function stepSwing() {
-            // angular acceleration for pendulum (restoring force)
             let accel = -Math.sin(ang * Math.PI / 180) * GRAVITY_SWING;
             angVel += accel;
             angVel *= DAMP;
             ang += angVel;
-            angle = Math.min(22, Math.max(-22, ang));   // limit realistic swing
+            angle = Math.min(22, Math.max(-22, ang));
             updateVisuals();
             if (Math.abs(angVel) > 0.05 || Math.abs(angle) > 0.5) {
                 swingAnimId = requestAnimationFrame(stepSwing);
             } else {
                 angle = 0;
-                angularVel = 0;
-                updateVisuals();
                 swingAnimId = null;
+                updateVisuals();
             }
         }
         stepSwing();
     }
-
-    // Snap back vertical with bounce & then settle
+    
     function snapBackVertical() {
         if (swingAnimId) cancelAnimationFrame(swingAnimId);
-        let velY = pullOffset * 0.35;  // initial retract velocity
+        let velY = pullOffset * 0.38;
         let posY = pullOffset;
-        const DAMP_Y = 0.88;
+        const DAMP_Y = 0.87;
         const RESTITUTION = 0.7;
         function stepVertical() {
             velY *= DAMP_Y;
@@ -384,8 +368,7 @@
                 posY = 0;
                 pullOffset = 0;
                 updateVisuals();
-                // after snap, add a gentle swing because of release impulse
-                startSwingOscillation(angle * 0.7, angularVel * 0.6 + (velY * -0.25));
+                startSwingOscillation(angle * 0.6, (velY * -0.2) + (angle * 0.15));
                 return;
             }
             if (posY < 0) {
@@ -398,8 +381,7 @@
         }
         stepVertical();
     }
-
-    // Mouse / touch handling for realistic dragging
+    
     function onMouseDown(e) {
         e.preventDefault();
         dragging = true;
@@ -408,47 +390,36 @@
         startX = e.clientX;
         knob.style.cursor = "grabbing";
     }
-
+    
     function onMouseMove(e) {
         if (!dragging) return;
         let dy = (e.clientY - startY) * 0.65;
         let rawPull = Math.max(0, Math.min(MAX_PULL, dy));
         pullOffset = rawPull;
-        currentPull = rawPull;
-        
-        // Horizontal swing physics during drag (natural feel)
         let dx = (e.clientX - startX) * 0.45;
-        let targetAngle = Math.max(-20, Math.min(20, dx));
-        angle = targetAngle;
+        angle = Math.max(-20, Math.min(20, dx));
         updateVisuals();
     }
-
+    
     function onMouseUp(e) {
         if (!dragging) return;
         dragging = false;
         knob.style.cursor = "grab";
         let triggered = (pullOffset >= TRIGGER_THRESHOLD);
-        
         if (triggered && !triggerStarted) {
             triggerStarted = true;
-            // activate the system: start the whole experience
             startSequence();
-            // quick snap but avoid further interactions
             snapBackVertical();
         } else {
-            // just normal snap with realistic oscillation
-            // store current angle velocity for swing effect
-            let currentAngular = angle * 0.2;
-            angularVel = currentAngular;
             snapBackVertical();
         }
     }
-
-    // Add event listeners
+    
     knob.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
-    // touch support for mobile
+    
+    // touch events
     knob.addEventListener("touchstart", (e) => {
         e.preventDefault();
         let touch = e.touches[0];
@@ -462,8 +433,7 @@
         if (!dragging) return;
         let touch = e.touches[0];
         let dy = (touch.clientY - startY) * 0.65;
-        let rawPull = Math.max(0, Math.min(MAX_PULL, dy));
-        pullOffset = rawPull;
+        pullOffset = Math.max(0, Math.min(MAX_PULL, dy));
         let dx = (touch.clientX - startX) * 0.45;
         angle = Math.max(-20, Math.min(20, dx));
         updateVisuals();
@@ -483,13 +453,12 @@
         }
     });
     
-    // initialize string visuals
     pullOffset = 0;
     angle = 0;
     updateVisuals();
-
+    
     // --------------------------------------------------------------
-    // 2. MESSAGE SEQUENCE + TYPING
+    // 2. MESSAGE SEQUENCE (typing)
     // --------------------------------------------------------------
     const messageSteps = [
         "Welcome Dear. Pasandida Aurat 💛",
@@ -519,26 +488,141 @@
             msgIndex++;
             typeMessage(messageSteps[msgIndex]);
         } else if (msgIndex + 1 === messageSteps.length) {
-            // close main screen and show final card (password locked)
+            // close main screen and open final card with ANIMATED TYPING (password removed)
             document.getElementById("mainScreen").style.display = "none";
             const finalCardDiv = document.getElementById("finalCard");
             finalCardDiv.style.display = "block";
             finalCardDiv.style.animation = "fadeGlow 0.8s ease";
-            // reset password UI: locked state
-            document.getElementById("finalBlessingContainer").style.display = "none";
-            document.getElementById("lockStatus").innerHTML = "🔒 The final blessing is locked 🔒";
-            document.getElementById("passInput").value = "";
-            // ensure no accidental bypass
+            
+            // HIDE HEART ICON while final message is being written
+            const heartIcon = document.getElementById("heartIcon");
+            heartIcon.classList.add("hidden");
+            
+            // Start animated typing for final long message (no password required)
+            startFinalMessageTyping();
         }
     }
     
     // --------------------------------------------------------------
-    // 3. START SEQUENCE (flicker, zoom, music, particles)
+    // 3. FINAL MESSAGE WITH TYPING ANIMATION (elegant, no password)
+    // --------------------------------------------------------------
+    const finalFullMessage = `✨ Numbers 6:24-26 ✨
+“The LORD bless you and keep you;
+the LORD make his face shine upon you
+and be gracious to you;
+the LORD turn his face toward you
+and give you peace.”
+
+🌟 Wishing you a year bursting with discoveries in MXenes, ion interactions, and energy systems. May your research break new ground, fuel innovation, and shape a sustainable future. Your brilliance inspires everyone around you!
+
+Happiest Birthday Once Again — the universe shines brighter because of you! 💛`;
+    
+    const urduMessage = `خدا آپ کے ساتھ ہو… ہر خواب شرمندہ تعبیر ہو 💛`;
+    const signatureLine = `💫 With endless admiration & respect 💫`;
+    
+    let finalTypingActive = false;
+    let finalTypingInterval = null;
+    let finalCharIndex = 0;
+    let finalContainer = null;
+    let urduContainer = null;
+    let signatureContainer = null;
+    
+    function startFinalMessageTyping() {
+        finalContainer = document.getElementById("finalTypingContainer");
+        const urduElem = document.getElementById("finalUrduContainer");
+        const signatureElem = document.getElementById("finalSignature");
+        
+        if (!finalContainer) return;
+        finalContainer.innerHTML = "";
+        urduElem.style.display = "none";
+        signatureElem.innerHTML = "";
+        
+        finalCharIndex = 0;
+        finalTypingActive = true;
+        
+        function typeNextChar() {
+            if (!finalTypingActive) return;
+            if (finalCharIndex < finalFullMessage.length) {
+                finalContainer.innerHTML += finalFullMessage[finalCharIndex];
+                finalCharIndex++;
+                finalTypingInterval = setTimeout(typeNextChar, 28);
+                // Auto scroll to bottom
+                finalContainer.scrollTop = finalContainer.scrollHeight;
+            } else {
+                // message done, now show urdu with typing effect
+                clearTimeout(finalTypingInterval);
+                typeUrduWithAnimation();
+            }
+        }
+        typeNextChar();
+    }
+    
+    function typeUrduWithAnimation() {
+        const urduElem = document.getElementById("finalUrduContainer");
+        const signatureElem = document.getElementById("finalSignature");
+        urduElem.style.display = "block";
+        urduElem.innerHTML = "";
+        let urduIndex = 0;
+        function typeUrdu() {
+            if (urduIndex < urduMessage.length) {
+                urduElem.innerHTML += urduMessage[urduIndex];
+                urduIndex++;
+                setTimeout(typeUrdu, 35);
+            } else {
+                // finally type signature line with slight delay
+                setTimeout(() => {
+                    let sigIndex = 0;
+                    function typeSignature() {
+                        if (sigIndex < signatureLine.length) {
+                            signatureElem.innerHTML += signatureLine[sigIndex];
+                            sigIndex++;
+                            setTimeout(typeSignature, 28);
+                        } else {
+                            // All done, show the heart again after final message is fully written
+                            const heartIcon = document.getElementById("heartIcon");
+                            heartIcon.classList.remove("hidden");
+                            // Add a little extra sparkle
+                            createCelebrationSparkles();
+                        }
+                    }
+                    typeSignature();
+                }, 180);
+            }
+        }
+        typeUrdu();
+    }
+    
+    function createCelebrationSparkles() {
+        for(let i = 0; i < 30; i++) {
+            setTimeout(() => {
+                let spark = document.createElement("div");
+                spark.style.position = "absolute";
+                spark.style.width = "8px";
+                spark.style.height = "8px";
+                spark.style.background = `radial-gradient(circle, #ffb6c1, #ffd966)`;
+                spark.style.borderRadius = "50%";
+                spark.style.left = Math.random() * 100 + "%";
+                spark.style.top = Math.random() * 80 + 10 + "%";
+                spark.style.pointerEvents = "none";
+                spark.style.zIndex = "999";
+                spark.style.animation = "sparkleFade 1s ease-out forwards";
+                document.body.appendChild(spark);
+                setTimeout(() => spark.remove(), 1000);
+            }, i * 60);
+        }
+    }
+    
+    // Add sparkle keyframe
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `@keyframes sparkleFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }`;
+    document.head.appendChild(styleSheet);
+    
+    // --------------------------------------------------------------
+    // 4. START SEQUENCE (flicker, zoom, music, particles)
     // --------------------------------------------------------------
     function startSequence() {
         if (window.sequenceStarted) return;
         window.sequenceStarted = true;
-        // hide switch handle after activation (fade out)
         const switchContainer = document.getElementById("switchHandle");
         switchContainer.style.transition = "opacity 1s";
         switchContainer.style.opacity = "0";
@@ -556,16 +640,14 @@
                 document.getElementById("overlay").style.opacity = "0";
                 document.body.classList.add("zoomed");
                 document.getElementById("mainScreen").style.display = "block";
-                // play music
                 let music = document.getElementById("bgMusic");
-                music.play().catch(e => console.log("autoplay blocked, user interaction allowed"));
+                music.play().catch(e => console.log("autoplay blocked"));
                 typeMessage(messageSteps[0]);
                 createParticleField();
             }
         }, 130);
     }
     
-    // particles for atmosphere
     function createParticleField() {
         setInterval(() => {
             let particle = document.createElement("div");
@@ -581,7 +663,6 @@
         }, 380);
     }
     
-    // secret heart message
     function revealSecretMsg() {
         const secretDiv = document.getElementById("secretMsg");
         secretDiv.style.opacity = "1";
@@ -590,45 +671,7 @@
         }, 4000);
     }
     
-    // --------------------------------------------------------------
-    // 4. PASSWORD PROTECTED FINAL MESSAGE (only final message)
-    //    Password = "LADYBOSS" case-insensitive, can be hint
-    // --------------------------------------------------------------
-    function attemptUnlock() {
-        const inputPass = document.getElementById("passInput").value.trim();
-        const correctCode = "LADYBOSS";   // elegant secure code
-        const finalBlessingDiv = document.getElementById("finalBlessingContainer");
-        const lockStatusSpan = document.getElementById("lockStatus");
-        
-        if (inputPass.toUpperCase() === correctCode) {
-            // show final blessing with animation
-            finalBlessingDiv.style.display = "block";
-            finalBlessingDiv.style.animation = "elegantRise 0.9s cubic-bezier(0.2,0.9,0.4,1.1) forwards";
-            lockStatusSpan.innerHTML = "🔓✨ Unlocked with love ✨🔓";
-            lockStatusSpan.style.color = "#ffd966";
-            // hide password section or disable?
-            const passSection = document.querySelector(".password-section");
-            if(passSection) passSection.style.opacity = "0.5";
-            document.getElementById("passInput").disabled = true;
-            // optional: change button text
-            let btn = document.querySelector(".unlock-btn");
-            if(btn) btn.innerText = "💛 Blessed 💛";
-            btn.disabled = true;
-        } else {
-            lockStatusSpan.innerHTML = "❌ Incorrect code. Hint: Lady Boss's essence (all caps) ❌";
-            lockStatusSpan.style.color = "#ff8888";
-            setTimeout(() => {
-                if(lockStatusSpan.innerHTML.includes("Incorrect")) {
-                    lockStatusSpan.innerHTML = "🔒 The final blessing is locked 🔒";
-                    lockStatusSpan.style.color = "#ffb6c1";
-                }
-            }, 2000);
-            document.getElementById("passInput").value = "";
-            document.getElementById("passInput").focus();
-        }
-    }
-    
-    // Preload & extra to ensure music starts after pull (needs user interaction)
+    // Audio init after first user interaction if needed
     document.body.addEventListener("click", function initAudio() {
         let music = document.getElementById("bgMusic");
         if(music && music.paused && window.sequenceStarted) {
@@ -636,16 +679,11 @@
         }
     }, { once: true });
     
-    // in case the final card appears and someone press enter
-    document.getElementById("passInput")?.addEventListener("keypress", (e) => {
-        if(e.key === "Enter") attemptUnlock();
-    });
-    
-    // ensure we show the switch ready and prevent double trigger
     window.sequenceStarted = false;
     
-    // small tweak: keep switch visible and realistic
-    console.log("Lady Boss System — pull the golden knob 💛");
+    // Ensure heart doesn't reappear before final message fully typed
+    // Additional: remove password prompt completely
+    console.log("Lady Boss — Glowing Knob + Animated Final Message ✨");
 </script>
 </body>
 </html>
