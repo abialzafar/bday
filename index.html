@@ -1,369 +1,651 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Lady Boss System 💛</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Lady Boss System 🔐 | Birthday Magic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url("background.avif") no-repeat center center/cover;
+            font-family: 'Segoe UI', 'Poppins', monospace;
+            overflow: hidden;
+            transition: transform 2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: relative;
+        }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
+        body.zoomed {
+            transform: scale(1.05);
+        }
 
-body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:url("background.avif") no-repeat center/cover;
-    font-family:monospace;
-    overflow:hidden;
-    transition:2s;
-}
+        /* Dark overlay fade */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            transition: opacity 2s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
 
-body.zoomed{transform:scale(1.05);}
+        /* ---- REALISTIC STRING & KNOB (PENDULUM + SWING) ---- */
+        .switch-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+            cursor: grab;
+            filter: drop-shadow(0 0 6px rgba(0,240,255,0.5));
+        }
 
-/* overlay */
-.overlay{
-    position:fixed;
-    width:100%;height:100%;
-    background:#000;
-    transition:2s;
-}
+        .string {
+            width: 3px;
+            height: 180px;
+            background: linear-gradient(145deg, #f5e6d3, #c0a16b);
+            transform-origin: top;
+            transition: height 0.03s linear;
+            border-radius: 2px;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
 
-/* SWITCH */
-.switch-container{
-    position:absolute;
-    top:0;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
+        .knob {
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at 30% 30%, #ffd966, #ffb347);
+            border-radius: 50%;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,215,0,0.5), 0 0 15px #ffb6c1;
+            cursor: grab;
+            transform-origin: top center;
+            transition: transform 0.02s linear;
+            position: relative;
+        }
+        .knob:active {
+            cursor: grabbing;
+        }
+        /* tiny reflection */
+        .knob::after {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,200,0.8);
+            border-radius: 50%;
+        }
 
-.string{
-    width:3px;
-    height:180px;
-    background:linear-gradient(#aaa,#fff);
-}
+        /* panels */
+        .screen {
+            display: none;
+            width: 90%;
+            max-width: 780px;
+            padding: 35px 30px;
+            border-radius: 48px;
+            background: rgba(10, 5, 20, 0.65);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,182,193,0.3);
+            text-align: center;
+            color: #fff7f0;
+            z-index: 15;
+            animation: fadeGlow 1s ease;
+        }
 
-.knob{
-    width:32px;height:32px;
-    border-radius:50%;
-    background:radial-gradient(circle,#00f0ff,#ffb6c1);
-    box-shadow:0 0 30px #00f0ff,0 0 20px #ffb6c1;
-    cursor:grab;
-    transform-origin:top center;
-}
+        @keyframes fadeGlow {
+            0% { opacity: 0; transform: scale(0.96); backdrop-filter: blur(0px);}
+            100% { opacity: 1; transform: scale(1); backdrop-filter: blur(16px);}
+        }
 
-/* SCREEN */
-.screen{
-    display:none;
-    width:90%;
-    max-width:750px;
-    padding:40px;
-    border-radius:25px;
-    background:rgba(0,0,0,0.55);
-    backdrop-filter:blur(12px);
-    text-align:center;
-    color:white;
-}
+        .typing {
+            border-right: 2px solid #ffb6c1;
+            white-space: pre-line;
+            font-size: clamp(1.2rem, 4vw, 1.9rem);
+            font-weight: 500;
+            margin-bottom: 30px;
+            font-family: monospace;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            letter-spacing: 0.3px;
+        }
 
-.typing{
-    border-right:2px solid #00f0ff;
-    white-space:pre-line;
-    margin-bottom:20px;
-}
+        button {
+            background: linear-gradient(115deg, #ffb347, #ff6b6b);
+            border: none;
+            color: #1e1a2f;
+            padding: 12px 34px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 18px #ffb6c1;
+        }
 
-/* button */
-button{
-    padding:12px 30px;
-    border:none;
-    border-radius:30px;
-    background:linear-gradient(45deg,#ffb6c1,#00f0ff);
-    cursor:pointer;
-}
+        /* Heart + secret */
+        .heart {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 38px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 8px #ff6b8b);
+            animation: beat 1.1s infinite ease;
+            z-index: 18;
+        }
+        @keyframes beat {
+            0%,100%{ transform: translateX(-50%) scale(1);}
+            50%{ transform: translateX(-50%) scale(1.28); text-shadow: 0 0 12px #ff99aa;}
+        }
+        .secret {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffdfb3;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.6s;
+            white-space: nowrap;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 19;
+        }
 
-/* heart */
-.heart{
-    position:absolute;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:32px;
-    animation:beat 1.2s infinite;
-}
-@keyframes beat{50%{transform:translateX(-50%) scale(1.3);}}
+        /* FINAL CARD - password protected + entrance animation */
+        #finalCard {
+            display: none;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(18px);
+            border-radius: 56px;
+            border-left: 4px solid #ffb347;
+            border-right: 4px solid #ffb6c1;
+        }
+        .protected-content {
+            transition: all 0.5s;
+        }
+        .password-section {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .password-section input {
+            background: rgba(30,20,40,0.8);
+            border: 1px solid #ffb6c1;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 1rem;
+            color: white;
+            width: 70%;
+            text-align: center;
+            outline: none;
+            font-family: monospace;
+        }
+        .password-section input:focus {
+            box-shadow: 0 0 12px #ffb6c1;
+        }
+        .unlock-btn {
+            background: #ff9f4a;
+            padding: 8px 25px;
+            font-size: 1rem;
+        }
+        .locked-message {
+            color: #ffb6c1;
+            font-style: italic;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.4);
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 40px;
+        }
+        .final-blessing {
+            display: none;
+            animation: elegantRise 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        @keyframes elegantRise {
+            0% { opacity: 0; transform: translateY(45px) scale(0.96); filter: blur(6px);}
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0);}
+        }
+        .final-blessing h2 {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, #FFD966, #FFA07A);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        .urdu {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 1.5rem;
+            line-height: 1.7;
+            color: #ffecb3;
+        }
 
-.secret{
-    position:absolute;
-    bottom:90px;
-    left:50%;
-    transform:translateX(-50%);
-    opacity:0;
-    color:#ffb6c1;
-    transition:1s;
-}
-
-/* urdu */
-.urdu{
-    font-family:'Noto Nastaliq Urdu', serif;
-    font-size:20px;
-}
-
-/* canvas */
-canvas{
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    pointer-events:none;
-}
-</style>
+        /* particles */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: floatUp linear forwards;
+            z-index: 1;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0.7;}
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0;}
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="overlay" id="overlay"></div>
+<div class="overlay" id="overlay" style="opacity:1"></div>
 
-<div class="switch-container" id="switch">
-    <div class="string"></div>
-    <div class="knob" id="knob"></div>
+<!-- REAL SWING STRING -->
+<div class="switch-container" id="switchHandle">
+    <div class="string" id="stringEl"></div>
+    <div class="knob" id="knobEl"></div>
 </div>
 
+<!-- MAIN MESSAGES -->
 <div class="screen" id="mainScreen">
-    <h1 id="text" class="typing"></h1>
-    <button onclick="nextStep()">Continue</button>
+    <h1 id="textMessage" class="typing"></h1>
+    <button onclick="advanceMessage()">✨ Continue ✨</button>
 </div>
 
-<div class="heart" onclick="showSecret()">❤️</div>
-<div class="secret" id="secret">You are more special than you think 💛</div>
+<!-- HEART & SECRET -->
+<div class="heart" onclick="revealSecretMsg()">💛</div>
+<div class="secret" id="secretMsg">💎 You are a brilliant soul — your spark changes the world 💎</div>
 
+<!-- FINAL CARD (PASSWORD PROTECTED) -->
 <div class="screen" id="finalCard">
-    <h2 id="finalTitle" class="typing"></h2>
-    <p id="verse" class="typing"></p>
-    <p id="message" class="typing"></p>
-    <p id="urduText" class="urdu typing"></p>
-    <p id="ending" class="typing"></p>
+    <div class="protected-content" id="protectedZone">
+        <div class="locked-message" id="lockStatus">🔒 The final blessing is locked 🔒</div>
+        <div class="password-section">
+            <input type="password" id="passInput" placeholder="Enter secret code ✨" autocomplete="off">
+            <button class="unlock-btn" onclick="attemptUnlock()">Unlock Heartfelt Message</button>
+        </div>
+        <div id="finalBlessingContainer" class="final-blessing">
+            <h2>💛 Happy Birthday, Lady Boss 💛</h2>
+            <p><strong>✨ Numbers 6:24-26 ✨</strong><br>
+            “The LORD bless you and keep you;<br>
+            the LORD make his face shine upon you<br>
+            and be gracious to you;<br>
+            the LORD turn his face toward you<br>
+            and give you peace.”</p>
+            <p>🌟 Wishing you a year bursting with discoveries in MXenes, ion interactions, and energy systems. May your research break new ground, fuel innovation, and shape a sustainable future. Your brilliance inspires everyone around you!</p>
+            <p class="urdu">خدا آپ کے ساتھ ہو… ہر خواب شرمندہ تعبیر ہو 💛</p>
+            <p>💫 Happiest Birthday Once Again — the universe shines brighter because of you! 💫</p>
+        </div>
+    </div>
 </div>
 
-<canvas id="fireworks"></canvas>
-
-<audio id="music" loop>
-<source src="music.mp3">
+<audio id="bgMusic" loop preload="auto">
+    <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
+    // --------------------------------------------------------------
+    // 1. REALISTIC PENDULUM + SWING physics (string behaves like real object)
+    // --------------------------------------------------------------
+    const knob = document.getElementById("knobEl");
+    const stringDiv = document.getElementById("stringEl");
+    let dragging = false;
+    let startY = 0, currentPull = 0;
+    let startX = 0, currentAngle = 0;      // for horizontal swing
+    let velocityPull = 0, velocityAngle = 0;
+    let animationFrame = null;
+    let isAnimatingSnap = false;
+    let triggerStarted = false;
 
-/* ---------------- TEXT ---------------- */
-const messages=[
-"Welcome Dear. Pasandida Aurat 💛",
-"I have been luckier to know you than MXene | Ion Interaction | Energy Systems...\n\nI want to say something:"
-];
+    const MAX_PULL = 130;      // max downward stretch
+    const TRIGGER_THRESHOLD = 70;  // pull distance to activate
+    
+    // physics constants for realistic oscillation
+    let angle = 0;          // current swing angle in degrees
+    let angularVel = 0;
+    let pullOffset = 0;     // current vertical displacement
 
-let step=0;
-const textEl=document.getElementById("text");
-
-function type(text,speed=40){
-    textEl.innerHTML="";
-    let i=0;
-    let interval=setInterval(()=>{
-        textEl.innerHTML+=text[i];
-        if(++i>=text.length) clearInterval(interval);
-    },speed);
-}
-
-function typeElement(el,text,speed=30,cb){
-    el.innerHTML="";
-    let i=0;
-    let interval=setInterval(()=>{
-        el.innerHTML+=text[i];
-        if(++i>=text.length){
-            clearInterval(interval);
-            if(cb) cb();
-        }
-    },speed);
-}
-
-/* ---------------- SWITCH PHYSICS ---------------- */
-const knob=document.getElementById("knob");
-const string=document.querySelector(".string");
-
-let dragging=false,startY=0,currentY=0,angle=0,velocity=0;
-
-knob.addEventListener("mousedown",(e)=>{
-    dragging=true;
-    startY=e.clientY;
-});
-
-document.addEventListener("mousemove",(e)=>{
-    if(!dragging) return;
-
-    let dy=(e.clientY-startY)*0.6;
-    currentY=Math.max(0,Math.min(120,dy));
-
-    let dx=e.clientX-window.innerWidth/2;
-    angle=Math.max(-20,Math.min(20,dx/15));
-
-    updateSwitch();
-});
-
-document.addEventListener("mouseup",()=>{
-    if(!dragging) return;
-    dragging=false;
-
-    if(currentY>70) startSequence();
-    else releaseSwing();
-});
-
-function updateSwitch(){
-    knob.style.transform=`translateY(${currentY}px) rotate(${angle}deg)`;
-    string.style.height=180+currentY+"px";
-}
-
-function releaseSwing(){
-    velocity=angle*0.2;
-
-    let interval=setInterval(()=>{
-        velocity*=0.92;
-        angle-=velocity;
-        currentY*=0.85;
-
-        if(Math.abs(angle)<0.5 && currentY<1){
-            angle=0;currentY=0;
-            clearInterval(interval);
-        }
-        updateSwitch();
-    },16);
-}
-
-/* ---------------- START ---------------- */
-function startSequence(){
-    document.getElementById("switch").style.display="none";
-
-    let flicker=0;
-    let fx=setInterval(()=>{
-        document.body.style.filter=flicker%2?"brightness(0.6)":"brightness(1)";
-        if(++flicker>6){
-            clearInterval(fx);
-            overlay.style.opacity=0;
-            document.body.classList.add("zoomed");
-            mainScreen.style.display="block";
-            music.play();
-            type(messages[0]);
-            createParticles();
-        }
-    },120);
-}
-
-/* ---------------- NEXT ---------------- */
-function nextStep(){
-    step++;
-    if(step<messages.length){
-        type(messages[step]);
-    }else{
-        mainScreen.style.display="none";
-        finalCard.style.display="block";
-        startFinalAnimation();
-        startFireworks();
+    function updateVisuals() {
+        // apply string height: original 180px + pullOffset
+        let newHeight = 180 + Math.min(MAX_PULL, pullOffset);
+        stringDiv.style.height = newHeight + "px";
+        // apply swing angle and vertical translation
+        knob.style.transform = `translateY(${pullOffset}px) rotate(${angle}deg)`;
     }
-}
 
-/* ---------------- FINAL TEXT ---------------- */
-function startFinalAnimation(){
-    typeElement(finalTitle,"💛 Happy Birthday 💛",60,()=>{
-        typeElement(verse,"Numbers 6:24-26:\nThe LORD bless you and keep you;<br> the LORD make his face shine upon you;<br> the LORD give you peace.",30,()=>{
-            typeElement(message,"Wishing you a fantastic year ahead filled with groundbreaking discoveries and exciting breakthroughs in your work on MXenes, ion interactions, and energy systems. May your research continue to push boundaries, spark innovation, and contribute to a more sustainable and energy-efficient future",25,()=>{
-                typeElement(urduText,"خدا آپکے ساتھ ہو… آپکی ہر دلی مراد پوری کرے 💛",40,()=>{
-                    typeElement(ending,"Happiest Birthday Once Again 💛",50);
-                });
-            });
-        });
+    // Damped harmonic swing (pendulum style) when released
+    let swingAnimId = null;
+    function startSwingOscillation(initialAngle, initialAngularVel) {
+        if (swingAnimId) cancelAnimationFrame(swingAnimId);
+        let ang = initialAngle;
+        let angVel = initialAngularVel;
+        const DAMP = 0.97;
+        const GRAVITY_SWING = 0.45;
+        function stepSwing() {
+            // angular acceleration for pendulum (restoring force)
+            let accel = -Math.sin(ang * Math.PI / 180) * GRAVITY_SWING;
+            angVel += accel;
+            angVel *= DAMP;
+            ang += angVel;
+            angle = Math.min(22, Math.max(-22, ang));   // limit realistic swing
+            updateVisuals();
+            if (Math.abs(angVel) > 0.05 || Math.abs(angle) > 0.5) {
+                swingAnimId = requestAnimationFrame(stepSwing);
+            } else {
+                angle = 0;
+                angularVel = 0;
+                updateVisuals();
+                swingAnimId = null;
+            }
+        }
+        stepSwing();
+    }
+
+    // Snap back vertical with bounce & then settle
+    function snapBackVertical() {
+        if (swingAnimId) cancelAnimationFrame(swingAnimId);
+        let velY = pullOffset * 0.35;  // initial retract velocity
+        let posY = pullOffset;
+        const DAMP_Y = 0.88;
+        const RESTITUTION = 0.7;
+        function stepVertical() {
+            velY *= DAMP_Y;
+            posY += velY;
+            if (posY <= 0.5 && Math.abs(velY) < 0.3) {
+                posY = 0;
+                pullOffset = 0;
+                updateVisuals();
+                // after snap, add a gentle swing because of release impulse
+                startSwingOscillation(angle * 0.7, angularVel * 0.6 + (velY * -0.25));
+                return;
+            }
+            if (posY < 0) {
+                posY = 0;
+                velY = -velY * RESTITUTION;
+            }
+            pullOffset = Math.min(MAX_PULL, Math.max(0, posY));
+            updateVisuals();
+            requestAnimationFrame(stepVertical);
+        }
+        stepVertical();
+    }
+
+    // Mouse / touch handling for realistic dragging
+    function onMouseDown(e) {
+        e.preventDefault();
+        dragging = true;
+        if (swingAnimId) cancelAnimationFrame(swingAnimId);
+        startY = e.clientY;
+        startX = e.clientX;
+        knob.style.cursor = "grabbing";
+    }
+
+    function onMouseMove(e) {
+        if (!dragging) return;
+        let dy = (e.clientY - startY) * 0.65;
+        let rawPull = Math.max(0, Math.min(MAX_PULL, dy));
+        pullOffset = rawPull;
+        currentPull = rawPull;
+        
+        // Horizontal swing physics during drag (natural feel)
+        let dx = (e.clientX - startX) * 0.45;
+        let targetAngle = Math.max(-20, Math.min(20, dx));
+        angle = targetAngle;
+        updateVisuals();
+    }
+
+    function onMouseUp(e) {
+        if (!dragging) return;
+        dragging = false;
+        knob.style.cursor = "grab";
+        let triggered = (pullOffset >= TRIGGER_THRESHOLD);
+        
+        if (triggered && !triggerStarted) {
+            triggerStarted = true;
+            // activate the system: start the whole experience
+            startSequence();
+            // quick snap but avoid further interactions
+            snapBackVertical();
+        } else {
+            // just normal snap with realistic oscillation
+            // store current angle velocity for swing effect
+            let currentAngular = angle * 0.2;
+            angularVel = currentAngular;
+            snapBackVertical();
+        }
+    }
+
+    // Add event listeners
+    knob.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    // touch support for mobile
+    knob.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        let touch = e.touches[0];
+        startY = touch.clientY;
+        startX = touch.clientX;
+        dragging = true;
+        if (swingAnimId) cancelAnimationFrame(swingAnimId);
+        knob.style.cursor = "grabbing";
     });
-}
+    window.addEventListener("touchmove", (e) => {
+        if (!dragging) return;
+        let touch = e.touches[0];
+        let dy = (touch.clientY - startY) * 0.65;
+        let rawPull = Math.max(0, Math.min(MAX_PULL, dy));
+        pullOffset = rawPull;
+        let dx = (touch.clientX - startX) * 0.45;
+        angle = Math.max(-20, Math.min(20, dx));
+        updateVisuals();
+        e.preventDefault();
+    });
+    window.addEventListener("touchend", () => {
+        if (!dragging) return;
+        dragging = false;
+        knob.style.cursor = "grab";
+        let triggered = (pullOffset >= TRIGGER_THRESHOLD);
+        if (triggered && !triggerStarted) {
+            triggerStarted = true;
+            startSequence();
+            snapBackVertical();
+        } else {
+            snapBackVertical();
+        }
+    });
+    
+    // initialize string visuals
+    pullOffset = 0;
+    angle = 0;
+    updateVisuals();
 
-/* ---------------- SECRET ---------------- */
-function showSecret(){
-    secret.style.opacity=1;
-}
-
-/* ---------------- PARTICLES ---------------- */
-function createParticles(){
-    setInterval(()=>{
-        let p=document.createElement("div");
-        p.style.position="absolute";
-        p.style.width="4px";
-        p.style.height="4px";
-        p.style.borderRadius="50%";
-        p.style.left=Math.random()*100+"%";
-        p.style.background=Math.random()>0.5?"#ffb6c1":"#00f0ff";
-        p.style.animation="float 10s linear";
-        document.body.appendChild(p);
-        setTimeout(()=>p.remove(),10000);
-    },300);
-}
-
-/* ---------------- FIREWORKS (BEAT SYNC) ---------------- */
-function startFireworks(){
-
-    const canvas=document.getElementById("fireworks");
-    const ctx=canvas.getContext("2d");
-    canvas.width=innerWidth;
-    canvas.height=innerHeight;
-
-    const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const src=audioCtx.createMediaElementSource(music);
-    const analyser=audioCtx.createAnalyser();
-
-    src.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    analyser.fftSize=64;
-    const data=new Uint8Array(analyser.frequencyBinCount);
-
-    let particles=[];
-
-    function fire(intensity){
-        let x=Math.random()*canvas.width;
-        let y=Math.random()*canvas.height/2;
-
-        for(let i=0;i<intensity/5;i++){
-            particles.push({
-                x,y,
-                angle:Math.random()*Math.PI*2,
-                speed:Math.random()*3+intensity/30,
-                life:80
-            });
+    // --------------------------------------------------------------
+    // 2. MESSAGE SEQUENCE + TYPING
+    // --------------------------------------------------------------
+    const messageSteps = [
+        "Welcome Dear. Pasandida Aurat 💛",
+        "I have been luckier to know you than MXene | Ion Interaction | Energy Systems from 6th July, 2025.\n\nI want to take a moment to say:"
+    ];
+    let msgIndex = 0;
+    const textElem = document.getElementById("textMessage");
+    let typingInterval = null;
+    
+    function typeMessage(text, speed = 42) {
+        if (typingInterval) clearInterval(typingInterval);
+        textElem.innerHTML = "";
+        let i = 0;
+        typingInterval = setInterval(() => {
+            if (i < text.length) {
+                textElem.innerHTML += text[i];
+                i++;
+            } else {
+                clearInterval(typingInterval);
+                typingInterval = null;
+            }
+        }, speed);
+    }
+    
+    function advanceMessage() {
+        if (msgIndex + 1 < messageSteps.length) {
+            msgIndex++;
+            typeMessage(messageSteps[msgIndex]);
+        } else if (msgIndex + 1 === messageSteps.length) {
+            // close main screen and show final card (password locked)
+            document.getElementById("mainScreen").style.display = "none";
+            const finalCardDiv = document.getElementById("finalCard");
+            finalCardDiv.style.display = "block";
+            finalCardDiv.style.animation = "fadeGlow 0.8s ease";
+            // reset password UI: locked state
+            document.getElementById("finalBlessingContainer").style.display = "none";
+            document.getElementById("lockStatus").innerHTML = "🔒 The final blessing is locked 🔒";
+            document.getElementById("passInput").value = "";
+            // ensure no accidental bypass
         }
     }
-
-    function animate(){
-        requestAnimationFrame(animate);
-        analyser.getByteFrequencyData(data);
-
-        let bass=data[2];
-        if(bass>140) fire(bass);
-
-        ctx.fillStyle="rgba(0,0,0,0.2)";
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-
-        particles.forEach((p,i)=>{
-            p.x+=Math.cos(p.angle)*p.speed;
-            p.y+=Math.sin(p.angle)*p.speed;
-            p.life--;
-
-            ctx.beginPath();
-            ctx.arc(p.x,p.y,2,0,Math.PI*2);
-            ctx.fillStyle="hsl("+Math.random()*360+",100%,70%)";
-            ctx.fill();
-
-            if(p.life<=0) particles.splice(i,1);
-        });
+    
+    // --------------------------------------------------------------
+    // 3. START SEQUENCE (flicker, zoom, music, particles)
+    // --------------------------------------------------------------
+    function startSequence() {
+        if (window.sequenceStarted) return;
+        window.sequenceStarted = true;
+        // hide switch handle after activation (fade out)
+        const switchContainer = document.getElementById("switchHandle");
+        switchContainer.style.transition = "opacity 1s";
+        switchContainer.style.opacity = "0";
+        setTimeout(() => {
+            switchContainer.style.display = "none";
+        }, 1000);
+        
+        let flashCount = 0;
+        let flickerInterval = setInterval(() => {
+            document.body.style.filter = flashCount % 2 === 0 ? "brightness(0.55)" : "brightness(1)";
+            flashCount++;
+            if (flashCount > 8) {
+                clearInterval(flickerInterval);
+                document.body.style.filter = "";
+                document.getElementById("overlay").style.opacity = "0";
+                document.body.classList.add("zoomed");
+                document.getElementById("mainScreen").style.display = "block";
+                // play music
+                let music = document.getElementById("bgMusic");
+                music.play().catch(e => console.log("autoplay blocked, user interaction allowed"));
+                typeMessage(messageSteps[0]);
+                createParticleField();
+            }
+        }, 130);
     }
-
-    animate();
-}
-
+    
+    // particles for atmosphere
+    function createParticleField() {
+        setInterval(() => {
+            let particle = document.createElement("div");
+            particle.classList.add("particle");
+            particle.style.left = Math.random() * 100 + "%";
+            particle.style.width = Math.random() * 8 + 3 + "px";
+            particle.style.height = particle.style.width;
+            particle.style.background = `radial-gradient(circle, ${Math.random() > 0.6 ? '#ffb6c1' : '#00f0ff'}, #ffd966)`;
+            particle.style.animationDuration = 8 + Math.random() * 12 + "s";
+            particle.style.opacity = Math.random() * 0.7 + 0.2;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 14000);
+        }, 380);
+    }
+    
+    // secret heart message
+    function revealSecretMsg() {
+        const secretDiv = document.getElementById("secretMsg");
+        secretDiv.style.opacity = "1";
+        setTimeout(() => {
+            secretDiv.style.opacity = "0";
+        }, 4000);
+    }
+    
+    // --------------------------------------------------------------
+    // 4. PASSWORD PROTECTED FINAL MESSAGE (only final message)
+    //    Password = "LADYBOSS" case-insensitive, can be hint
+    // --------------------------------------------------------------
+    function attemptUnlock() {
+        const inputPass = document.getElementById("passInput").value.trim();
+        const correctCode = "LADYBOSS";   // elegant secure code
+        const finalBlessingDiv = document.getElementById("finalBlessingContainer");
+        const lockStatusSpan = document.getElementById("lockStatus");
+        
+        if (inputPass.toUpperCase() === correctCode) {
+            // show final blessing with animation
+            finalBlessingDiv.style.display = "block";
+            finalBlessingDiv.style.animation = "elegantRise 0.9s cubic-bezier(0.2,0.9,0.4,1.1) forwards";
+            lockStatusSpan.innerHTML = "🔓✨ Unlocked with love ✨🔓";
+            lockStatusSpan.style.color = "#ffd966";
+            // hide password section or disable?
+            const passSection = document.querySelector(".password-section");
+            if(passSection) passSection.style.opacity = "0.5";
+            document.getElementById("passInput").disabled = true;
+            // optional: change button text
+            let btn = document.querySelector(".unlock-btn");
+            if(btn) btn.innerText = "💛 Blessed 💛";
+            btn.disabled = true;
+        } else {
+            lockStatusSpan.innerHTML = "❌ Incorrect code. Hint: Lady Boss's essence (all caps) ❌";
+            lockStatusSpan.style.color = "#ff8888";
+            setTimeout(() => {
+                if(lockStatusSpan.innerHTML.includes("Incorrect")) {
+                    lockStatusSpan.innerHTML = "🔒 The final blessing is locked 🔒";
+                    lockStatusSpan.style.color = "#ffb6c1";
+                }
+            }, 2000);
+            document.getElementById("passInput").value = "";
+            document.getElementById("passInput").focus();
+        }
+    }
+    
+    // Preload & extra to ensure music starts after pull (needs user interaction)
+    document.body.addEventListener("click", function initAudio() {
+        let music = document.getElementById("bgMusic");
+        if(music && music.paused && window.sequenceStarted) {
+            music.play().catch(()=>{});
+        }
+    }, { once: true });
+    
+    // in case the final card appears and someone press enter
+    document.getElementById("passInput")?.addEventListener("keypress", (e) => {
+        if(e.key === "Enter") attemptUnlock();
+    });
+    
+    // ensure we show the switch ready and prevent double trigger
+    window.sequenceStarted = false;
+    
+    // small tweak: keep switch visible and realistic
+    console.log("Lady Boss System — pull the golden knob 💛");
 </script>
-
 </body>
 </html>
